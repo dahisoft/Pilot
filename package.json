@@ -1,0 +1,39 @@
+{
+  "name": "pilot",
+  "version": "0.0.1",
+  "description": "Pilot Project for Hamda Hikmah Software",
+  "main": "server.js",
+  "author": "Hendra Dwi Saputra <dahisoft@outlook.com>",
+  "license": "MIT",
+  "repository": {},
+  "keywords": [
+    "Mongo",
+    "Express",
+    "Node"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc -p ./src/tsconfig.json",
+    "prestart": "npm run clean && npm run build",
+    "start": "node ./dist/bin/www.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "cors": "^2.8.4",
+    "debug": "^3.0.0",
+    "errorhandler": "^1.5.0",
+    "express": "^4.15.4",
+    "morgan": "^1.8.2"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.16.5",
+    "@types/cors": "^2.8.1",
+    "@types/debug": "0.0.30",
+    "@types/errorhandler": "0.0.31",
+    "@types/express": "^4.0.37",
+    "@types/morgan": "^1.7.32",
+    "rimraf": "^2.6.1",
+    "typescript": "^2.4.2"
+  }
+}
