@@ -1,15 +1,16 @@
 /**
- * Kebutuhan Modul
+ * Pustaka Utama (yang mendasari jalannya program ini)
  */
-import { Server } from '../server';
+import { Server } from '../app/server';
 import * as http from 'http';
 import * as debugModule from 'debug';
-let debug = debugModule('detail');
+let debug = debugModule('express:server');
+let config = require('../app/config/utama');
 
 /**
  * Dapatkan port dari lingkungan dan simpan Express
  */
-let port = normalizePort(process.env.PORT || '3000');
+let port = normalizePort(config.port);
 let app = Server.bootstrap().app;
 app.set('port', port);
 

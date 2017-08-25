@@ -3,10 +3,15 @@
  */
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import * as errorHandler from 'errorhandler';
 import * as morgan from 'morgan';
 import * as path from 'path';
 import * as cors from 'cors';
+import errorHandler = require("errorhandler");
+import * as debugModule from 'debug';
+let debug = debugModule('express:server');
+import mongoose = require("mongoose");
+let config = require('./config/utama');
+let login = require('./apis/login')
 
 /**
  * Kode Server
@@ -35,10 +40,8 @@ export class Server {
   constructor() {
     // membuat aplikasi express
     this.app = express();
-
     // memanggil konfigurasi
     this.config();
-
     // menambahkan api
     this.api();
   }
@@ -72,6 +75,8 @@ export class Server {
 
     // mengaktifkan CORS pre-flight
     router.options('*', cors(corsOptions));
+
+    login(this.app);
   }
 
   /**
@@ -80,7 +85,7 @@ export class Server {
    * @method config
    */
   public config() {
-    // middleware morgan untuk melakukan pencatata
+    // middleware morgan untuk melakukan pencatatan
     // permintaan pada server HTTP
     this.app.use(morgan('dev'));
 
@@ -89,37 +94,8 @@ export class Server {
       extended: true
     }));
 
-    // akitfkan middleware untuk mengurai json
+    // aktifkan middleware untuk mengurai json
     this.app.use(bodyParser.json());
-
-    /**
-     * 
-     * Diaktifkan ketika sudah aplikasi frontend sudah siap pakai
-     * Ditambahkan juga konfigurasi ke database karena masih belum siap
-     * ketika belum jadi cukup dijadikan komentar tapi jangan dibuang
-     * 
-    // koneksikan ke database MongoDB dengan Mongoose
-    mongoose.Promise = global.Promise;
-    let mongodbUri = process.env.MONGOLAB_URI || 'mongodb://localhost:27017/purwarupa';
-    var options = {
-      useMongoClient: true,
-      socketTimeoutMS: 0,
-      keepAlive: true,
-      reconnectTries: 30
-    }
-    mongoose.connect(mongodbUri, options);
-    mongoose.connection.on('error', error => {
-      console.error(error);
-    });
-    // membuat rute untuk berkas publik yang bisa diunduh oleh klien
-    this.app.use(express.static(path.resolve('dist/public')));
-    var router = express.Router();
-    router.get('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      res.sendFile(path.resolve('dist/public') + '/index.html');
-      next();
-    });
-    this.app.use('/', router);
-    */
 
     // tangkap 404 dan teruskan ke penanganan kesalahan
     this.app.use(function (err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -127,7 +103,20 @@ export class Server {
       next(err);
     });
 
-    // Penanganan Kesalahan
+    // penanganan kesalahan
     this.app.use(errorHandler());
+
+    // pengaturan koneksi ke basisdata
+    mongoose.Promise = global.Promise;
+    var options = {
+      useMongoClient: true,
+      socketTimeoutMS: 0,
+      keepAlive: true,
+      reconnectTries: 30
+    }
+    mongoose.connect(config.basisdata, options);
+    mongoose.connection.on("error", error => {
+      debug(error);
+    });
   }
 }
